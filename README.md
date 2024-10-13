@@ -3,6 +3,12 @@
 A simple implementation of Tetris, using Rust.
 
 # Usage
+To start, in a command window:
+
+```
+ cargo run cmd/retris     
+```
+
 Use the following keys on your keyboard:
 
 * Left arrow: move to left

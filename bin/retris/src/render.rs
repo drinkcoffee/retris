@@ -41,8 +41,8 @@ pub fn render() -> io::Result<()> {
     // Draw screen
     for y in 0..MAX_Y - 2 * BORDER {
         for x in 0..MAX_X - 2 * BORDER {
-            let colour = state::get_locked(x, y);
-            if colour != 0 {
+            let locked = state::get_locked(x, y);
+            if locked {
                 stdout
                     .queue(cursor::MoveTo(x + BORDER, y + BORDER))?
                     .queue(style::PrintStyledContent("X".red()))?;
@@ -51,14 +51,14 @@ pub fn render() -> io::Result<()> {
     }
 
     let coords = state::get_falling_coords();
-    let x1 :u16 = coords.0;
-    let y1 :u16 = coords.1;
-    let x2 :u16 = coords.2;
-    let y2 :u16 = coords.3;
-    let x3 :u16 = coords.4;
-    let y3 :u16 = coords.5;
-    let x4 :u16 = coords.6;
-    let y4 :u16 = coords.7;
+    let x1: u16 = coords.0;
+    let y1: u16 = coords.1;
+    let x2: u16 = coords.2;
+    let y2: u16 = coords.3;
+    let x3: u16 = coords.4;
+    let y3: u16 = coords.5;
+    let x4: u16 = coords.6;
+    let y4: u16 = coords.7;
 
     draw_dot(x1, y1).unwrap();
     draw_dot(x2, y2).unwrap();
@@ -69,13 +69,13 @@ pub fn render() -> io::Result<()> {
     Ok(())
 }
 
-fn draw_dot(x: u16, y: u16)  -> io::Result<()> {
+fn draw_dot(x: u16, y: u16) -> io::Result<()> {
     let mut stdout = io::stdout();
 
     if state::check_valid(x, y) {
         stdout
-        .queue(cursor::MoveTo(x,y))?
-        .queue(style::PrintStyledContent( "X".blue()))?;
+            .queue(cursor::MoveTo(x + BORDER, y + BORDER))?
+            .queue(style::PrintStyledContent("X".blue()))?;
     }
     Ok(())
 }

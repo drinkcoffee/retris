@@ -1,5 +1,8 @@
 mod state;
-use state::{fall_one, move_left, move_right, start_new_four, rotate_anticlockwise, rotate_clockwise};
+use state::{
+    fall_one, move_left, move_right, rotate_anticlockwise, rotate_clockwise, start_new_four,
+    update_if_dropped,
+};
 
 mod render;
 use render::render;
@@ -20,6 +23,7 @@ fn main() -> io::Result<()> {
 
     loop {
         fall_one();
+        update_if_dropped();
         render().unwrap();
 
         // Wait up to 1s for another event
@@ -34,10 +38,10 @@ fn main() -> io::Result<()> {
                 move_right();
             }
             if event == Event::Key(KeyCode::Char('z').into()) {
-              rotate_anticlockwise();
+                rotate_anticlockwise();
             }
             if event == Event::Key(KeyCode::Char('x').into()) {
-              rotate_clockwise();
+                rotate_clockwise();
             }
             if event == Event::Key(KeyCode::Esc.into()) {
                 break;

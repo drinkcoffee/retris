@@ -1,3 +1,4 @@
+// Copyright (c) Peter Robinson 2024
 mod state;
 use state::{
     fall_one, move_left, move_right, rotate_anticlockwise, rotate_clockwise, start_new_four,

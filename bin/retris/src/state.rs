@@ -1,3 +1,4 @@
+// Copyright (c) Peter Robinson 2024
 use std::panic;
 
 pub const MAX_X: u16 = 20;

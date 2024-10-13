@@ -17,14 +17,22 @@ enum FourObjType {
 static mut STATE: [[bool; MAX_Y as usize]; MAX_X as usize] =
     [[false; MAX_Y as usize]; MAX_X as usize];
 
-static mut FALLING_TYPE: FourObjType = FourObjType::None;
-static mut FALLING_LOCATION_Y: i16 = 0;
+static mut FALLING_TYPE: FourObjType = FourObjType::Square;
+static mut FALLING_LOCATION_Y: u16 = 0;
 static mut FALLING_LOCATION_X: u16 = MAX_X / 2;
 static mut FALLING_ORIENTATION: u16 = 0;
 
 pub fn start_new_four() {
     unsafe {
-        FALLING_TYPE = FourObjType::Straight;
+        match FALLING_TYPE {
+            FourObjType::None => { FALLING_TYPE = FourObjType::Straight; },
+            FourObjType::Straight => { FALLING_TYPE = FourObjType::Square; },
+            FourObjType::Square => { FALLING_TYPE = FourObjType::RightTrap; },
+            FourObjType::RightTrap => { FALLING_TYPE = FourObjType::Straight; },
+            _ => {panic!("Not implemented yet!");}
+        }
+
+        //FALLING_TYPE = FourObjType::Straight;
         FALLING_ORIENTATION = 0;
         FALLING_LOCATION_Y = 0;
         FALLING_LOCATION_X = MAX_X / 2;
@@ -90,20 +98,21 @@ pub fn rotate_anticlockwise() {
 // Convert the falling object to part of the background if it has hit the bottom.
 pub fn update_if_dropped() {
     let coords = get_falling_coords();
-    let x1: u16 = coords.0;
-    let y1: u16 = coords.1;
-    let x2: u16 = coords.2;
-    let y2: u16 = coords.3;
-    let x3: u16 = coords.4;
-    let y3: u16 = coords.5;
-    let x4: u16 = coords.6;
-    let y4: u16 = coords.7;
+    let x1: i16 = coords.0;
+    let y1: i16 = coords.1;
+    let x2: i16 = coords.2;
+    let y2: i16 = coords.3;
+    let x3: i16 = coords.4;
+    let y3: i16 = coords.5;
+    let x4: i16 = coords.6;
+    let y4: i16 = coords.7;
 
     let mut lock = false;
 
     println!("x1 {} y1 {}", x1, y1);
+    let max_y = MAX_Y as i16;
 
-    if y1 + 1 == MAX_Y || y2 + 1 == MAX_Y || y3 + 1 == MAX_Y || y4 + 1 == MAX_Y {
+    if y1 + 1 == max_y || y2 + 1 == max_y || y3 + 1 == max_y || y4 + 1 == max_y {
         lock = true;
     }
     else if get_locked(x1, y1 + 1)
@@ -125,90 +134,33 @@ pub fn update_if_dropped() {
     }
 }
 
-pub fn get_locked(x: u16, y: u16) -> bool {
-    if x >= MAX_X {
+pub fn get_locked(x: i16, y: i16) -> bool {
+    if x >= MAX_X as i16 {
         panic!("X too big: {}", x)
     }
-    if y >= MAX_Y {
+    if y >= MAX_Y as i16 {
         panic!("Y too big: {}", y)
     }
 
     return unsafe { STATE[x as usize][y as usize] };
 }
 
-pub fn get_falling_coords() -> (u16, u16, u16, u16, u16, u16, u16, u16) {
-    let mut x1: u16 = 0;
-    let mut x2: u16 = 0;
-    let mut x3: u16 = 0;
-    let mut x4: u16 = 0;
-    let mut y1: u16 = 0;
-    let mut y2: u16 = 0;
-    let mut y3: u16 = 0;
-    let mut y4: u16 = 0;
 
-    let fall_type;
-    let fall_x;
-    let fall_y;
-    let fall_orientation;
 
-    unsafe {
-        fall_type = FALLING_TYPE;
-        fall_x = FALLING_LOCATION_X;
-        fall_y = FALLING_LOCATION_Y;
-        fall_orientation = FALLING_ORIENTATION;
-    }
-
-    match fall_type {
-        FourObjType::None => {
-            panic!("Fall type not set");
-        }
-        FourObjType::Straight => match fall_orientation {
-            0 | 2 => {
-                x1 = fall_x;
-                x2 = fall_x + 1;
-                x3 = fall_x + 2;
-                x4 = fall_x + 3;
-                y1 = fall_y as u16;
-                y2 = fall_y as u16;
-                y3 = fall_y as u16;
-                y4 = fall_y as u16;
-            }
-            1 | 3 => {
-                x1 = fall_x;
-                x2 = fall_x;
-                x3 = fall_x;
-                x4 = fall_x;
-                y1 = fall_y as u16;
-                y2 = fall_y as u16 + 1;
-                y3 = fall_y as u16 + 2;
-                y4 = fall_y as u16 + 3;
-            }
-            _ => {
-                panic!("Unknown orientation");
-            }
-        },
-        _ => {
-            panic!("Not supported yet");
-        }
-    }
-
-    return (x1, y1, x2, y2, x3, y3, x4, y4);
-}
-
-pub fn check_valid(x: u16, y: u16) -> bool {
-    return x < MAX_X && y < MAX_Y;
+pub fn check_valid(x: i16, y: i16) -> bool {
+    return x > 0 && y > 0 && x < MAX_X as i16 && y < MAX_Y as i16;
 }
 
 fn is_invalid_change() -> bool {
     let coords = get_falling_coords();
-    let x1: u16 = coords.0;
-    let y1: u16 = coords.1;
-    let x2: u16 = coords.2;
-    let y2: u16 = coords.3;
-    let x3: u16 = coords.4;
-    let y3: u16 = coords.5;
-    let x4: u16 = coords.6;
-    let y4: u16 = coords.7;
+    let x1: i16 = coords.0;
+    let y1: i16 = coords.1;
+    let x2: i16 = coords.2;
+    let y2: i16 = coords.3;
+    let x3: i16 = coords.4;
+    let y3: i16 = coords.5;
+    let x4: i16 = coords.6;
+    let y4: i16 = coords.7;
 
     if !check_valid(x1, y1) || !check_valid(x2, y2) || !check_valid(x3, y3) || !check_valid(x4, y4) {
         return true;
@@ -223,3 +175,143 @@ fn is_invalid_change() -> bool {
 
     return false;
 }
+
+pub fn get_falling_coords() -> (i16, i16, i16, i16, i16, i16, i16, i16) {
+    let mut x1: i16 = 0;
+    let mut x2: i16 = 0;
+    let mut x3: i16 = 0;
+    let mut x4: i16 = 0;
+    let mut y1: i16 = 0;
+    let mut y2: i16 = 0;
+    let mut y3: i16 = 0;
+    let mut y4: i16 = 0;
+
+    let fall_type;
+    let fall_x;
+    let fall_y;
+    let fall_orientation;
+
+    unsafe {
+        fall_type = FALLING_TYPE;
+        fall_x = FALLING_LOCATION_X as i16;
+        fall_y = FALLING_LOCATION_Y as i16;
+        fall_orientation = FALLING_ORIENTATION;
+    }
+
+    match fall_type {
+        FourObjType::None => {
+            panic!("Fall type not set");
+        }
+        FourObjType::Straight => match fall_orientation {
+            0 => {
+                x1 = fall_x;
+                x2 = fall_x + 1;
+                x3 = fall_x + 2;
+                x4 = fall_x + 3;
+                y1 = fall_y;
+                y2 = fall_y;
+                y3 = fall_y;
+                y4 = fall_y;
+            }
+            1 => {
+                x1 = fall_x;
+                x2 = fall_x;
+                x3 = fall_x;
+                x4 = fall_x;
+                y1 = fall_y;
+                y2 = fall_y + 1;
+                y3 = fall_y + 2;
+                y4 = fall_y + 3;
+            }
+            2 => {
+                x1 = fall_x;
+                x2 = fall_x - 1;
+                x3 = fall_x - 2;
+                x4 = fall_x - 3;
+                y1 = fall_y;
+                y2 = fall_y;
+                y3 = fall_y;
+                y4 = fall_y;
+            }
+            3 => {
+                x1 = fall_x;
+                x2 = fall_x;
+                x3 = fall_x;
+                x4 = fall_x;
+                y1 = fall_y;
+                y2 = fall_y - 1;
+                y3 = fall_y - 2;
+                y4 = fall_y - 3;
+            }
+            _ => {
+                panic!("Unknown orientation");
+            }
+        }
+        FourObjType::Square => {
+            x1 = fall_x;
+            x2 = fall_x;
+            x3 = fall_x + 1;
+            x4 = fall_x + 1;
+            y1 = fall_y;
+            y2 = fall_y + 1;
+            y3 = fall_y;
+            y4 = fall_y + 1;
+        }
+        FourObjType::RightTrap => match fall_orientation {
+            0 => {
+                x1 = fall_x;
+                x2 = fall_x + 1;
+                x3 = fall_x + 1;
+                x4 = fall_x + 2;
+                y1 = fall_y + 1;
+                y2 = fall_y;
+                y3 = fall_y + 1;
+                y4 = fall_y;
+            }
+            1 => {
+                x1 = fall_x;
+                x2 = fall_x;
+                x3 = fall_x + 1;
+                x4 = fall_x + 1;
+                y1 = fall_y + 1;
+                y2 = fall_y + 2;
+                y3 = fall_y + 2;
+                y4 = fall_y + 3;
+            }
+            2 => {
+                x1 = fall_x;
+                x2 = fall_x - 1;
+                x3 = fall_x - 1;
+                x4 = fall_x - 2;
+                y1 = fall_y + 1;
+                y2 = fall_y + 1;
+                y3 = fall_y + 2;
+                y4 = fall_y + 2;
+            }
+            3 => {
+                x1 = fall_x;
+                x2 = fall_x;
+                x3 = fall_x - 1;
+                x4 = fall_x - 1;
+                y1 = fall_y + 1;
+                y2 = fall_y;
+                y3 = fall_y;
+                y4 = fall_y - 1;
+            }
+            _ => {
+                panic!("Unknown orientation");
+            }
+        }
+        _ => {
+            panic!("Not supported yet");
+        }
+    }
+
+    return (x1, y1, x2, y2, x3, y3, x4, y4);
+}
+
+
+// LeftTrap,
+//     RightTrap,
+//     LShape,
+//     ReverseLShape

@@ -66,6 +66,11 @@ pub fn render() -> io::Result<()> {
     draw_dot(x3, y3).unwrap();
     draw_dot(x4, y4).unwrap();
 
+    // Move the cursor to the bottom so any debug in println 
+    // occurs at the bottom of the screen.
+    stdout
+    .queue(cursor::MoveTo(MAX_X, MAX_Y))?;
+
     stdout.flush()?;
     Ok(())
 }

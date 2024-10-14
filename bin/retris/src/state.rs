@@ -110,7 +110,6 @@ pub fn update_if_dropped() {
 
     let mut lock = false;
 
-    println!("x1 {} y1 {}", x1, y1);
     let max_y = MAX_Y as i16;
 
     if y1 + 1 == max_y || y2 + 1 == max_y || y3 + 1 == max_y || y4 + 1 == max_y {
@@ -149,7 +148,7 @@ pub fn get_locked(x: i16, y: i16) -> bool {
 
 
 pub fn check_valid(x: i16, y: i16) -> bool {
-    return x > 0 && y > 0 && x < MAX_X as i16 && y < MAX_Y as i16;
+    return x >= 0 && y >= 0 && x < MAX_X as i16 && y < MAX_Y as i16;
 }
 
 fn is_invalid_change() -> bool {

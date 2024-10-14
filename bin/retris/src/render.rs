@@ -12,6 +12,7 @@ const BORDER: u16 = 1;
 const MAX_X: u16 = state::MAX_X + BORDER * 2;
 const MAX_Y: u16 = state::MAX_Y + BORDER * 2;
 
+// Render the screen
 pub fn render() -> io::Result<()> {
     let mut stdout = io::stdout();
 
@@ -75,6 +76,7 @@ pub fn render() -> io::Result<()> {
     Ok(())
 }
 
+// Draw one of the four dots that makes up a falling object.
 fn draw_dot(x: i16, y: i16) -> io::Result<()> {
     let mut stdout = io::stdout();
     let sum_x = x as u16 + BORDER;

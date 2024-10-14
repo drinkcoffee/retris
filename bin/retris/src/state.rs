@@ -23,6 +23,7 @@ static mut FALLING_LOCATION_Y: u16 = 0;
 static mut FALLING_LOCATION_X: u16 = MAX_X / 2;
 static mut FALLING_ORIENTATION: u16 = 0;
 
+// Start a new object falling from the top of the screen.
 pub fn start_new_four() {
     unsafe {
         match FALLING_TYPE {
@@ -33,19 +34,20 @@ pub fn start_new_four() {
             _ => {panic!("Not implemented yet!");}
         }
 
-        //FALLING_TYPE = FourObjType::Straight;
         FALLING_ORIENTATION = 0;
         FALLING_LOCATION_Y = 0;
         FALLING_LOCATION_X = MAX_X / 2;
     }
 }
 
+// Move the object down one row.
 pub fn fall_one() {
     unsafe {
         FALLING_LOCATION_Y += 1;
     }
 }
 
+// Move the falling object to the left, if the move is valid.
 pub fn move_left() {
     unsafe {
         if FALLING_LOCATION_X > 0 {
@@ -58,6 +60,7 @@ pub fn move_left() {
     }
 }
 
+// Move the falling object to the right, if the move is valid.
 pub fn move_right() {
     unsafe {
         if FALLING_LOCATION_X < MAX_X - 1 {
@@ -70,6 +73,7 @@ pub fn move_right() {
     }
 }
 
+// Rotate the falling object clockwise, if the move is valid.
 pub fn rotate_clockwise() {
     unsafe {
         FALLING_ORIENTATION += 1;
@@ -83,6 +87,7 @@ pub fn rotate_clockwise() {
     }
 }
 
+// Rotate the falling object anti-clockwise, if the move is valid.
 pub fn rotate_anticlockwise() {
     unsafe {
         if FALLING_ORIENTATION == 0 {
@@ -96,7 +101,8 @@ pub fn rotate_anticlockwise() {
     }
 }
 
-// Convert the falling object to part of the background if it has hit the bottom.
+// Convert the falling object to part of the background if it has hit the bottom
+// or has hit locked objects already at the bottom.
 pub fn update_if_dropped() {
     let coords = get_falling_coords();
     let x1: i16 = coords.0;
@@ -134,6 +140,7 @@ pub fn update_if_dropped() {
     }
 }
 
+// Determine if a location is a locked object at the bottom of the screen.
 pub fn get_locked(x: i16, y: i16) -> bool {
     if x >= MAX_X as i16 {
         panic!("X too big: {}", x)
@@ -145,12 +152,12 @@ pub fn get_locked(x: i16, y: i16) -> bool {
     return unsafe { STATE[x as usize][y as usize] };
 }
 
-
-
+// Check if a location is valid for a pixel.
 pub fn check_valid(x: i16, y: i16) -> bool {
     return x >= 0 && y >= 0 && x < MAX_X as i16 && y < MAX_Y as i16;
 }
 
+// Determine if the current coordinate for a falling object are valid.
 fn is_invalid_change() -> bool {
     let coords = get_falling_coords();
     let x1: i16 = coords.0;
@@ -176,6 +183,7 @@ fn is_invalid_change() -> bool {
     return false;
 }
 
+// Get the coordinates of the falling object.
 pub fn get_falling_coords() -> (i16, i16, i16, i16, i16, i16, i16, i16) {
     let mut x1: i16 = 0;
     let mut x2: i16 = 0;
